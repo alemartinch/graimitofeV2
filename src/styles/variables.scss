@@ -1,0 +1,65 @@
+// Global variables
+$grid-breakpoints: (
+  "xs": 0,
+  "sm": 600px,
+  "md": 960px,
+  "lg": 1367px,
+  "xl": 1904px - 24px,
+);
+$material-light: (
+  "text": (
+    "primary": #153240,
+    "secondary": rgba(21, 50, 64, 0.6),
+  ),
+);
+$material-dark: (
+  "text": (
+    "primary": #fff,
+  ),
+  "icons": (
+    "active": #fff,
+  ),
+);
+
+$shadow-key-ambient-opacity: rgba(99, 99, 99, 0.2);
+$shadow-key-penumbra-opacity: rgba(99, 99, 99, 0.2);
+$shadow-key-umbra-opacity: rgba(99, 99, 99, 0.2);
+
+$shadow-key-ambient: (
+  22: 0px 2px 8px 0px $shadow-key-ambient-opacity,
+  23: 0px 3px 8px $shadow-key-ambient-opacity,
+  24: 0px 7px 29px 0px $shadow-key-ambient-opacity,
+);
+$shadow-key-penumbra: (
+  22: 0px 0px 0px 0px,
+  23: 0px 0px 0px,
+  24: 0px 0px 0px 0px,
+);
+$shadow-key-umbra: (
+  22: 0px 0px 0px 0px,
+  23: 0px 0px 0px,
+  24: 0px 0px 0px 0px,
+);
+
+// Buttons
+$btn-hover-opacity: 0.2;
+$btn-font-weight: 700 !default;
+
+// Navigation Drawer
+$navigation-drawer-border-width: 0;
+$tooltip-font-size: 12px;
+$tooltip-background-color: #263238;
+
+// Pagination
+$pagination-item-height: 25px;
+$pagination-item-min-width: 25px;
+$pagination-more-height: 25px;
+$pagination-more-width: 25px;
+$pagination-navigation-height: 25px;
+$pagination-navigation-width: 25px;
+$pagination-item-font-size: 0.875rem;
+
+// Breadcrumbs
+$breadcrumbs-padding: 0 0 !default;
+$breadcrumbs-even-child-padding: 0 4px !default;
+$breadcrumbs-item-font-size: 12px !default;

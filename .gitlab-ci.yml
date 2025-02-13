@@ -1,0 +1,5 @@
+# Spec for building & deploying the project
+
+include:
+  - project: "los-caballeros-de-la-materia/tcmt-automation"
+    file: "/templates/gitlab/tcmt-frontend-base.yml"

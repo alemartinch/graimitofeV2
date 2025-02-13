@@ -1,0 +1,21 @@
+# Build stage
+FROM node:20-alpine as build-stage
+
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm install --progress=false
+COPY . .
+
+RUN npm run build
+
+# Serve stage
+FROM nginx:stable-alpine as serve-stage
+
+## Make a copy of default configuration file and change listen port to 8080
+RUN cp /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.orig && \
+    sed -i 's/listen[[:space:]]*80;/listen 8080;/g' /etc/nginx/conf.d/default.conf
+
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+EXPOSE 8080
+
+CMD ["nginx", "-g", "daemon off;"]

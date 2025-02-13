@@ -1,0 +1,24 @@
+services:
+  tcmt-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.serve
+    volumes:
+      - ./src:/app/src
+    ports:
+      - "8080:8080"
+    env_file: 
+      - ./.env.local
+    stdin_open: true
+    tty: true
+
+  tcmt-frontend-build:
+    build:
+      context: .
+      dockerfile: Dockerfile.build
+    volumes:
+      - ./src:/app/src
+    ports:
+      - "8080:8080"
+    env_file: 
+      - ./.env.local
