@@ -82,7 +82,7 @@ export default {
   },
 
   methods: {
-    ...mapActions("user", ["logout"]),
+    ...mapActions(["logout"]),
     ...mapActions(["set_alert"]),
 
     logout_user() {

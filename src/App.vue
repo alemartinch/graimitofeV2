@@ -33,7 +33,7 @@ import AppAlertMb from "@/components/reusable/AppAlertMb.vue";
 import AppAlert from "@/components/reusable/AppAlert.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Update } from "@/mixins/Update";
-import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapGetters, mapMutations } from "vuex";
 import "vuetify/dist/vuetify.min.css"
 
 export default {

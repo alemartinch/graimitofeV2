@@ -14,8 +14,10 @@ import {
   getMonthAgo,
   getMonthAfter,
   getWeekAfter,
+  getSixMonthsAgo,
 } from "@/store/modules/helpers";
 import { tcmtRegApi, eatApi } from "@/apis";
+import { EVENT_STATUSES, ROLES } from "../mixins/globals/index.js";
 
 Vue.use(Vuex);
 
@@ -38,6 +40,10 @@ export default new Vuex.Store({
       //   name: "Esta semana",
       //   range: [firstWeekDay(), getToday],
       // },
+      {
+        name: "Últimos 6 meses",
+        range: [getSixMonthsAgo, getToday],
+      },
       // {
       //   name: "Este mes",
       //   range: [firstMonthDay, getToday],
@@ -113,6 +119,49 @@ export default new Vuex.Store({
         state.har.tasks = repet_actions_by_owner;
       }
     },
+    SET_FILTERS: (state) => {
+      const currentUserId = +state.user.user.id;
+      const currentUserRoles = state.user.user.groups?.map((role) => role.name);
+      const isCurrentUserSme = currentUserRoles?.includes(ROLES.SME);
+
+      state.fca.actionsFilters = {
+        ordering: "status",
+        parent_event__status_not: "OPEN",
+        /*due_date_after: getSixMonthsAgo,
+        due_date_before: getToday,*/
+        owner__id: [isCurrentUserSme ? "" : currentUserId],
+      };
+
+      state.event.eventsFilters = {
+        status_not: EVENT_STATUSES.OPEN,
+        ordering: "-id",
+        /*occurrence_date_after: getSixMonthsAgo,
+        occurrence_date_before: getToday,*/
+      };
+
+      state.har.occurrencesFilters = {
+        ordering: "status,due_date",
+        /*due_date_after: getSixMonthsAgo,
+        due_date_before: getToday,*/
+        owner_id: [isCurrentUserSme ? "" : currentUserId],
+      };
+    },
+    UPDATE_LOGOUT: (state) => {
+      state.user.username = null;
+      state.user.user = null;
+      state.event.eventsFilters = {};
+      state.fca.actionsFilters = {};
+      state.har.regulationFilters = {};
+      state.har.occurrencesFilters = {};
+      //state.filters = state.defaultFilters;
+      localStorage.removeItem("username");
+      localStorage.removeItem("udata");
+      localStorage.removeItem("ufilters");
+      localStorage.removeItem("usettings");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("company");
+      localStorage.removeItem("access_facilities");
+    },
   },
 
   actions: {
@@ -121,7 +170,7 @@ export default new Vuex.Store({
     },
 
     get_page_data: ({ commit }) => {
-       
+      commit("SET_FILTERS");
       return new Promise(async (resolve, reject) => {
         try {
           const pageData = await eatApi.getFetcher().get("/pages/new-event");
@@ -150,6 +199,10 @@ export default new Vuex.Store({
             reject(error);
           });
       });
+    },
+
+    logout: (context) => {
+      context.commit("UPDATE_LOGOUT");
     },
   },
 

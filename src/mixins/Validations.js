@@ -24,7 +24,7 @@ export const Validations = {
         "El dato no es alfanumérico",
       rAlphaNumericSigns: (v) =>
         !v ||
-        /^[a-zA-Z0-9áéíóúàèìòùÁÉÍÓÚÀÈÌÒÙñÑ.,:()_\-¿?¡!@#$&\s]+$/.test(v) ||
+        /^[a-zA-Z0-9áéíóúàèìòùÁÉÍÓÚÀÈÌÒÙñÑ.,:(){}_\-¿?|¡!@#$&*+\s]+$/.test(v) ||
         "El dato no es válido",
       rNumeric: (v) => !v || /^[0-9]+$/.test(v) || "El dato no es numérico",
       rDecimal: (v) =>
@@ -63,11 +63,17 @@ export const Validations = {
         (/^[0-9]+$/.test(v) && v.length > 6 && v.length < 14) ||
         "El cuit consta de 10 o más cifras",
       rPasswordMin: (v) => v.length >= 8 || "Mínimo 8 caracteres",
+      /*rPasswordComplex: (v) =>
+          !v ||
+           /[A-Z]/.test(v) &&
+          /[!@#$%^&*()\-_=+[\]{};:'"\\|,.<>/?]/.test(v) ||
+          "Debe contener al menos una mayúscula y un carácter especial",*/
       rTodayOrBefore: (v) => v <= this.today,
       rTodayOrAfter: (v) => v >= this.today,
       r20daysForwardOrAfter: (v) => v >= this.twentyDaysForward,
     };
   },
 
-  methods: {},
+  methods: {
+  },
 };

@@ -45,12 +45,10 @@
       <template v-slot:filters>
         <FiltersPanel
           :data="filters"
-          :default-filter="{
-            ordering: 'status,due_date',
-            owner_id: isCurrentUserOnlySme ? '' : currentUserId,
-          }"
+          :default-filter="defaultFilter"
           v-on:set-filters="setTasksFilters"
           :set-filter="filtersCurrent"
+          :loading="har.loadings.fetchOccurrences"
         />
       </template>
     </LayoutPanel>
@@ -67,6 +65,7 @@ import { eatApi, tcmtReportsApi } from "@/apis";
 import qs from "qs";
 import TBtnPrimary from "@/components/TBtnPrimary.vue";
 import store from "@/store";
+import { getSixMonthsAgo, getToday } from "../store/modules/helpers.js";
 
 export default {
   name: "Tasks",
@@ -86,13 +85,24 @@ export default {
       "getFacilitiesByUser",
     ]),
 
-    filtersCurrent() {
-      const filter = this.har.occurrencesFilters;
-      // const defaultFilter = {};
-      // if (this.id?.length === filter?.facility_id?.length) {
-      //   filter.facility_id = null;
-      // }
+    defaultFilter() {
+      const filter = {
+        ordering: "status,due_date",
+        owner_id: [this.isCurrentUserOnlySme ? "" : this.currentUserId],
+        /*due_date_after: getSixMonthsAgo,
+        due_date_before: getToday,*/
+      };
+
       return filter;
+    },
+
+    filtersCurrent() {
+      const { page, page_size, ...filter } =  this.har.occurrencesFilters;
+      return {
+        owner_id: [this.isCurrentUserOnlySme ? "" : this.currentUserId],
+        ...filter,
+      };
+
     },
 
     facilityParams() {
@@ -101,9 +111,7 @@ export default {
     },
 
     isExternal() {
-      return store.getters["user/currentUserRoles"]?.includes("BASE")
-        ? true
-        : false;
+      return !!store.getters["user/currentUserRoles"]?.includes("BASE");
     },
 
     filters() {
@@ -118,6 +126,15 @@ export default {
             { key: "due_date", name: "Vencimiento" },
           ],
           divider: true,
+          multiple: false,
+        },
+        {
+          name: "Vencimiento",
+          param: ["due_date_after", "due_date_before"],
+          label: "Cualquier momento",
+          type: "date-range",
+          options: [...this.dateRangeOptions],
+          divider: false,
           multiple: false,
         },
         {
@@ -270,15 +287,6 @@ export default {
           label: "Todos los requerimientos",
           type: "number",
           divider: false,
-        },
-        {
-          name: "Vencimiento",
-          param: ["due_date_after", "due_date_before"],
-          label: "Cualquier momento",
-          type: "date-range",
-          options: [...this.dateRangeOptions],
-          divider: false,
-          multiple: false,
         },
       ];
     },

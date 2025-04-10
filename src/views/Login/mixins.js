@@ -1,5 +1,5 @@
 import { Validations } from "@/mixins/Validations";
-import { mapActions, mapGetters, mapState } from "vuex";
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
 import { eatApi, tcmtRegApi, tcmtReportsApi } from "@/apis";
 
 export const LoginMixin = {

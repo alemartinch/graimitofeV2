@@ -37,13 +37,10 @@
       <template v-slot:filters>
         <FiltersPanel
           :data="filters"
-          :default-filter="{
-            parent_event__status_not: 'OPEN',
-            ordering: 'status',
-            owner__id: isCurrentUserOnlySme ? '' : currentUserId,
-          }"
+          :default-filter="defaultFilter"
           v-on:set-filters="setActionsFilters"
           :set-filter="filtersCurrent"
+          :loading="fca.loading.fetchActions"
         />
       </template>
     </LayoutPanel>
@@ -59,6 +56,7 @@ import ActionsTable from "@/components/actions-page/ActionsTable.vue";
 import { tcmtReportsApi, eatApi } from "@/apis";
 import qs from "qs";
 import TBtnPrimary from "@/components/TBtnPrimary.vue";
+import { getSixMonthsAgo, getToday } from "../../store/modules/helpers.js";
 
 export default {
   name: "index.vue",
@@ -77,13 +75,24 @@ export default {
       "getFacilitiesByUser",
     ]),
 
-    filtersCurrent() {
-      const filter = this.fca.actionsFilters;
-      // const defaultFilter = null;
-      // if (this.id?.length === filter?.parent_event__facility__id?.length) {
-      //   filter.parent_event__facility__id = null;
-      // }
+    defaultFilter() {
+      const filter = {
+        parent_event__status_not: "OPEN",
+        ordering: "status",
+        owner__id: [this.isCurrentUserOnlySme ? "" : this.currentUserId],
+        /*due_date_after: getSixMonthsAgo,
+        due_date_before: getToday,*/
+      };
+
       return filter;
+    },
+
+    filtersCurrent() {
+      const { page, page_size, ...filter } = this.fca.actionsFilters;
+      return {
+        owner__id: [this.isCurrentUserOnlySme ? "" : this.currentUserId],
+        ...filter,
+      };
     },
 
     facilityParams() {
@@ -102,6 +111,15 @@ export default {
             { key: "due_date", name: "Vencimiento" },
           ],
           divider: true,
+          multiple: false,
+        },
+        {
+          name: "Vencimiento",
+          param: ["due_date_after", "due_date_before"],
+          label: "Cualquier momento",
+          type: "date-range",
+          options: [...this.dateRangeOptions],
+          divider: false,
           multiple: false,
         },
         {
@@ -226,25 +244,16 @@ export default {
           divider: true,
           multiple: true,
         },
-        {
-          name: "Vencimiento",
-          param: ["due_date_after", "due_date_before"],
-          label: "Cualquier momento",
-          type: "date-range",
-          options: [...this.dateRangeOptions],
-          divider: false,
-          multiple: false,
-        },
       ];
     },
 
     sectors() {
       if (this.fca.actionsFilters.parent_event__facility__id) {
         const facilitiesSelected = this.event.facilities.filter(({ id }) =>
-          this.fca.actionsFilters.parent_event__facility__id.includes(id)
+          this.fca.actionsFilters.parent_event__facility__id.includes(id),
         );
         const sectorsOfFacilitiesSelected = facilitiesSelected.map(
-          ({ sectors }) => sectors
+          ({ sectors }) => sectors,
         );
         return sectorsOfFacilitiesSelected.flat().map(({ id, name }) => {
           return { key: id, name: name };
@@ -271,7 +280,7 @@ export default {
       Object.keys(params).forEach(
         (key) =>
           (params[key] === null || params[key] === undefined) &&
-          delete params[key]
+          delete params[key],
       );
       delete params.page;
       delete params.page_size;

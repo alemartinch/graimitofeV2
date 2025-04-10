@@ -1,7 +1,8 @@
 <template>
-  <div
+  <v-card
     class="d-flex flex-column justify-space-between"
     style="height: 100%; width: 100%"
+    :disabled="loading"
   >
     <!--  Array de Filtros -->
     <div class="filter-fields">
@@ -153,7 +154,7 @@
                   setParentFilter(
                     filter.param,
                     child.parent_value_link,
-                    child.param
+                    child.param,
                   )
                 "
               />
@@ -188,11 +189,11 @@
         ><v-icon small>mdi-filter-remove-outline</v-icon></v-btn
       >
     </div>
-  </div>
+  </v-card>
 </template>
 
 <script>
-import { mapGetters, mapMutations } from "vuex";
+import { mapGetters, mapMutations, mapState } from "vuex";
 import AsyncCombobox from "@/components/reusable/AsyncCombobox.vue";
 
 export default {
@@ -213,6 +214,11 @@ export default {
       type: Object,
       default: () => {},
     },
+
+    loading: {
+      type: Boolean,
+      default: false
+    }
   },
 
   data() {
@@ -241,10 +247,10 @@ export default {
     this.textModel = JSON.parse(JSON.stringify(appliedFilter));
     for (const prop in this.textModel) {
       if (prop.includes("before")) {
-        this.dateRange[0] = this.textModel[prop];
+        this.dateRange[1] = this.textModel[prop];
       }
       if (prop.includes("after")) {
-        this.dateRange[1] = this.textModel[prop];
+        this.dateRange[0] = this.textModel[prop];
       }
     }
     this.adjustOrdering();
@@ -257,7 +263,7 @@ export default {
       const filtersNames = this.data.map((filter) => filter.name.toLowerCase());
       if (this.filterSearchInput) {
         return filtersNames.filter((fName) =>
-          fName.includes(this.filterSearchInput.toLowerCase())
+          fName.includes(this.filterSearchInput.toLowerCase()),
         );
       }
       return filtersNames;
@@ -290,7 +296,7 @@ export default {
     },
 
     dateRangeText() {
-      if (!this.dateRange) {
+      if (!this.dateRange?.length) {
         return "Selecciona el período";
       }
       const months = [
@@ -333,14 +339,15 @@ export default {
   },
 
   methods: {
-    ...mapMutations("user", ["SET_IS_DEFAULT_FILTER"]),
+
     setRangeDate(params) {
       const firstDateParam = params[0];
       const secondDateParam = params[1];
 
-      if (!this.dateRange) {
+      if (!this.dateRange?.length) {
         this.textModel[firstDateParam] = null;
         this.textModel[secondDateParam] = null;
+        return;
       }
 
       // Si la primera fecha es mayor se acomodan de forma correcta
@@ -367,15 +374,12 @@ export default {
     },
 
     resetChildren(children) {
-      //this.SET_IS_DEFAULT_FILTER(false);
-      //this.isFilterDefault = true;
       children.forEach((child) => {
         this.textModel[child.param] = null;
       });
     },
 
     applyFilter() {
-      //this.SET_IS_DEFAULT_FILTER(false);
       const filter = JSON.parse(JSON.stringify(this.textModel));
       this.lastAppliedFilter = JSON.parse(JSON.stringify(this.textModel));
       this.lastOrdering = this.ordering;
@@ -386,12 +390,22 @@ export default {
     },
 
     cleanFilter() {
-      //this.SET_IS_DEFAULT_FILTER(true);
       this.ordering = "";
-      this.dateRange = null;
       for (let prop in this.textModel) {
         this.textModel[prop] = null;
       }
+      let before = "";
+      let after = "";
+      for (const prop in this.defaultFilter) {
+        if (prop.includes("before")) {
+          before = this.defaultFilter[prop];
+        }
+        if (prop.includes("after")) {
+          after = this.defaultFilter[prop];
+        }
+      }
+      // Se usa $set por problemas de reactividad en el array
+      this.$set(this, "dateRange", [after, before]);
       this.textModel = { ...this.textModel, ...this.defaultFilter };
       this.adjustOrdering();
       //this.applyFilter();

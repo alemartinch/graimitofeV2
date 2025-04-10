@@ -280,15 +280,11 @@ export default {
     },
   },
   methods: {
-    ...mapActions("user", ["logout"]),
+    ...mapActions(["logout"]),
     ...mapActions(["set_alert"]),
-    ...mapMutations("har", ["reset_har_filters"]),
-    ...mapMutations("fca", ["reset_fca_filters"]),
 
     logout_user() {
       this.alertButtonLoading = true;
-      this.reset_har_filters();
-      this.reset_fca_filters();
       this.logout();
       this.alertButtonLoading = false;
       this.$router.push({ name: "login" });

@@ -9,6 +9,7 @@ import {
 } from "@/mixins/globals";
 import qs from "qs";
 import { purgeFilters } from "@/store/modules/helpers";
+import { getSixMonthsAgo, getToday } from "./helpers.js";
 
 const state = {
   temp_event: {
@@ -214,7 +215,7 @@ const getters = {
 
   noCompletedActionInEvent: (state, { extractActions }) => {
     return !extractActions.some((action) =>
-      [AS.COMPLETED, AS.EF_COMPLETED].includes(action.status)
+      [AS.COMPLETED, AS.EF_COMPLETED].includes(action.status),
     );
   },
 
@@ -298,7 +299,7 @@ const mutations = {
     // Formateo la fecha de ocurrencia
     state.temp_event.occurrence_date = state.temp_event.occurrence_date.substr(
       0,
-      10
+      10,
     );
 
     if (state.temp_event?.event_origin === EO.MEET) {
@@ -520,7 +521,7 @@ const mutations = {
 
   remove_participants: (state, payload) => {
     const index = state.temp_event.participants.findIndex(
-      (p) => p.id === payload.id
+      (p) => p.id === payload.id,
     );
     if (index >= 0) state.temp_event.participants.splice(index, 1);
   },
@@ -531,7 +532,7 @@ const mutations = {
 
   delete_event_file: (state, fileId) => {
     const fileIndex = state.temp_event.files.findIndex(
-      (file) => file.id === fileId
+      (file) => file.id === fileId,
     );
     state.temp_event.files.splice(fileIndex, 1);
   },
@@ -547,9 +548,6 @@ const mutations = {
   set_events_filter: (state, filters) => {
     state.eventsFilters = { ...state.eventsFilters, ...filters };
     purgeFilters(state.eventsFilters, filters);
-  },
-  reset_events_filter: (state) => {
-    state.eventsFilters = {};
   },
 
   SET_EVENTS_DATA: (state, eventsData) => {
@@ -643,13 +641,13 @@ const actions = {
     // Adecuo los participantes
     event.participants = [];
     state.temp_event.participants?.forEach((p) =>
-      event.participants.push(p.id)
+      event.participants.push(p.id),
     );
 
     // Adecuo las areas de procesos
     event.process_areas = [];
     state.temp_event.process_areas.forEach((pa) =>
-      event.process_areas.push(pa.id)
+      event.process_areas.push(pa.id),
     );
 
     // Adecuo las Tags
@@ -744,7 +742,7 @@ const actions = {
           eatApi.getFetcher(),
           `events/${state.temp_event.id}/files`,
           objectData,
-          file
+          file,
         )
           .then((response) => {
             file.filename = response.data.results.filename;

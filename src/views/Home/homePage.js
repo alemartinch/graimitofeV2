@@ -314,7 +314,6 @@ export default {
 
     getRegulationOccurrences() {
       this.set_occurrences_filters({
-        owner_id: [this.currentUserId],
         ordering: "status,due_date",
         status: [TASK_STATUSES.OVERDUE, TASK_STATUSES.PENDING],
       });

@@ -138,7 +138,7 @@
                 tooltip="Enviar correo a responsable"
                 @click="sendActionMailToOwner(action)"
               >
-                mdi-email-send-outline
+                mdi-email-outline
               </t-btn-icon>
             </td>
           </tr>
@@ -241,18 +241,13 @@ export default {
     ...mapMutations("fca", [
       "set_actions_filter",
       "SET_ACTION",
-      "reset_fca_filters",
     ]),
     ...mapActions("fca", ["get_actions"]),
 
     getActions() {
-      // this.reset_fca_filters();
       this.set_actions_filter({
         page: this.page,
         page_size: this.options.itemsPerPage,
-        ordering: "status",
-        parent_event__status_not: "OPEN",
-        owner__id: this.isCurrentUserOnlySme ? "" : this.currentUserId,
       });
       this.get_actions().catch(() => {
         this.SET_ALERT({

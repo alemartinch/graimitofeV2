@@ -1,5 +1,6 @@
 const purgeFilters = (newFilters) => {
   for (let prop in newFilters) {
+    // Eliminar propiedades con valores falsy, vacíos, null o undefined
     if (
       !newFilters[prop] ||
       newFilters[prop] === "" ||
@@ -7,9 +8,20 @@ const purgeFilters = (newFilters) => {
       newFilters[prop] === undefined
     ) {
       delete newFilters[prop];
+      continue;
     }
-    if (Array.isArray(newFilters[prop]) && !newFilters[prop].length) {
-      delete newFilters[prop];
+
+    // Manejar arrays vacíos y eliminar elementos internos vacíos, null o undefined
+    if (Array.isArray(newFilters[prop])) {
+      // Filtrar el array eliminando elementos vacíos
+      newFilters[prop] = newFilters[prop].filter(
+        (item) => item !== "" && item !== null && item !== undefined
+      );
+
+      // Si el array quedó vacío después del filtrado, eliminar la propiedad
+      if (!newFilters[prop].length) {
+        delete newFilters[prop];
+      }
     }
   }
 };
@@ -68,6 +80,12 @@ const getMonthAfter = new Date(
   .toISOString()
   .substr(0, 10);
 
+const getSixMonthsAgo = new Date(
+  today.getFullYear(),
+  today.getMonth() - 6,
+  today.getDate()
+).toISOString().substr(0, 10);
+
 export {
   purgeFilters,
   getToday,
@@ -75,6 +93,7 @@ export {
   getWeekAgo,
   getWeekAfter,
   getMonthAgo,
+  getSixMonthsAgo,
   getMonthAfter,
   firstWeekDay,
   firstMonthDay,

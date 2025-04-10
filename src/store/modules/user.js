@@ -18,13 +18,13 @@ const state = {
   filters: localStorage.getItem("ufilters")
     ? JSON.parse(localStorage.getItem("ufilters"))
     : {
-        actions: {
-          owner_id: "",
-          status: [],
-          ordering: "status",
-          parent_event__status_not: EVENT_STATUSES.OPEN,
-        },
+      actions: {
+        owner_id: "",
+        status: [],
+        ordering: "status",
+        parent_event__status_not: EVENT_STATUSES.OPEN,
       },
+    },
   defaultFilters: {
     actions: {
       owner_id: "",
@@ -197,9 +197,7 @@ const getters = {
 };
 
 const mutations = {
-  SET_IS_DEFAULT_FILTER: (state, payload) => {
-    state.isdefaultFilters = payload;
-  },
+
   UPDATE_LOGIN: (state, payload) => {
     state.username = payload.results.username;
     state.user = payload.results;
@@ -221,18 +219,7 @@ const mutations = {
       JSON.stringify(state.access_facilities),
     );
   },
-  UPDATE_LOGOUT: (state) => {
-    state.username = null;
-    state.user = { user: null };
-    //state.filters = state.defaultFilters;
-    localStorage.removeItem("username");
-    localStorage.removeItem("udata");
-    localStorage.removeItem("ufilters");
-    localStorage.removeItem("usettings");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("company");
-    localStorage.removeItem("access_facilities");
-  },
+
   SET_PHOTO: (state, payload) => {
     state.user.photo = payload;
     // state.user.photo64 = payload;
@@ -348,10 +335,6 @@ const actions = {
           reject(error);
         });
     });
-  },
-
-  logout: (context) => {
-    context.commit("UPDATE_LOGOUT");
   },
 
   getUsers: (context) => {

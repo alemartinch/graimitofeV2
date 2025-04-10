@@ -67,7 +67,6 @@ export default {
   },
 
   created() {
-    this.reset_har_filters();
     this.getRegulationOccurrences();
   },
 
@@ -85,12 +84,10 @@ export default {
   },
 
   methods: {
-    ...mapMutations("har", ["set_occurrences_filters", "reset_har_filters"]),
+    ...mapMutations("har", ["set_occurrences_filters"]),
     ...mapActions("har", ["fetchOccurrences"]),
     getRegulationOccurrences() {
       this.set_occurrences_filters({
-        owner_id: user.state.user.id,
-        ordering: "status,due_date",
         status: [TASK_STATUSES.OVERDUE, TASK_STATUSES.PENDING],
         page_size: 5,
       });
@@ -98,8 +95,6 @@ export default {
     },
     goToTaskPanel() {
       this.set_occurrences_filters({
-        ordering: "status,due_date",
-        owner_id: user.state.user.id,
         page_size: 8,
         status: [TASK_STATUSES.OVERDUE, TASK_STATUSES.PENDING],
       });

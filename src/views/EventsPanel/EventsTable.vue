@@ -118,6 +118,7 @@ import { EVENT_STATUSES } from "@/mixins/globals";
 import TablePagination from "@/components/reusable/TablePagination.vue";
 import ExtendTooltip from "@/components/reusable/ExtendTooltip.vue";
 import TBtnIcon from "@/components/TBtnIcon.vue";
+import { getSixMonthsAgo, getToday } from "../../store/modules/helpers.js";
 
 export default {
   name: "EventsTable",
@@ -198,7 +199,7 @@ export default {
 
   methods: {
     ...mapMutations(["SET_ALERT"]),
-    ...mapMutations("event", ["set_events_filter", "reset_events_filter"]),
+    ...mapMutations("event", ["set_events_filter"]),
     ...mapActions("event", ["get_events"]),
 
     codeStatus(status) {
@@ -217,12 +218,9 @@ export default {
     },
 
     getEvents() {
-      // this.reset_events_filter();
       this.set_events_filter({
         page: this.page,
         page_size: this.options.itemsPerPage,
-        status_not: EVENT_STATUSES.OPEN,
-        ordering: "-id",
       });
       this.get_events()
         .catch(() => {

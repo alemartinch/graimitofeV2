@@ -53,7 +53,6 @@ export default {
     };
   },
   created() {
-    // this.reset_har_filters();
     this.set_regulation_filter({
       page: this.page,
       page_size: this.itemsPerPage,
@@ -101,7 +100,7 @@ export default {
 
   methods: {
     ...mapMutations(["SET_ALERT"]),
-    ...mapMutations("har", ["set_regulation_filter", "reset_har_filters"]),
+    ...mapMutations("har", ["set_regulation_filter"]),
     ...mapActions("har", ["fetchRegulations"]),
 
     getRegulations() {

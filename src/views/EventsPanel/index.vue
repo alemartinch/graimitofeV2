@@ -42,12 +42,10 @@
       <template v-slot:filters>
         <FiltersPanel
           :data="filters"
-          :default-filter="{
-            status_not: EVENT_STATUSES.OPEN,
-            ordering: '-id',
-          }"
+          :default-filter="defaultFilter"
           v-on:set-filters="setEventsFilters"
           :set-filter="filtersCurrent"
+          :loading="event.loading.fetchEvents"
         />
       </template>
     </LayoutPanel>
@@ -58,12 +56,13 @@
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
 import { tcmtReportsApi, eatApi } from "@/apis";
-import { EVENT_STATUSES } from "@/mixins/globals";
+import { EVENT_STATUSES } from "../../mixins/globals/index.js";
 import LayoutPanel from "@/Layouts/LayoutPanel.vue";
 import FiltersPanel from "@/views/Har/FiltersPanel.vue";
 import EventsTable from "@/views/EventsPanel/EventsTable.vue";
 import qs from "qs";
 import TBtnPrimary from "@/components/TBtnPrimary.vue";
+import { getSixMonthsAgo, getToday } from "../../store/modules/helpers.js";
 
 export default {
   name: "index.vue",
@@ -72,7 +71,6 @@ export default {
   data() {
     return {
       loading: { downloadReport: false },
-      defaultFilter: null,
       apiTags: [],
       id: [],
     };
@@ -93,9 +91,6 @@ export default {
   },
 
   computed: {
-    EVENT_STATUSES() {
-      return EVENT_STATUSES;
-    },
     ...mapState(["event", "fca", "dateRangeOptions", "user"]),
     ...mapGetters("user", [
       "currentUserId",
@@ -103,12 +98,18 @@ export default {
       "getFacilitiesByUser",
     ]),
 
+    defaultFilter() {
+      const filter = {
+        status_not: EVENT_STATUSES.OPEN,
+        ordering: "-id",
+        /*occurrence_date_after: getSixMonthsAgo,
+        occurrence_date_before: getToday,*/
+      };
+      return filter;
+    },
+
     filtersCurrent() {
-      const filter = this.event.eventsFilters;
-      // const defaultFilter = {};
-      // if (this.id?.length === filter?.facility__id?.length) {
-      //   filter.facility__id = null;
-      // }
+      const { page, page_size, ...filter } = this.event.eventsFilters;
       return filter;
     },
 
@@ -128,6 +129,15 @@ export default {
             { key: "occurrence_date", name: "Fecha ocurrencia" },
           ],
           divider: true,
+          multiple: false,
+        },
+        {
+          name: "Fecha de ocurrencia",
+          param: ["occurrence_date_after", "occurrence_date_before"],
+          label: "Cualquier momento",
+          type: "date-range",
+          options: [...this.dateRangeOptions],
+          divider: false,
           multiple: false,
         },
         {
@@ -231,15 +241,6 @@ export default {
           multiple: true,
         },
         {
-          name: "Fecha de ocurrencia",
-          param: ["occurrence_date_after", "occurrence_date_before"],
-          label: "Cualquier momento",
-          type: "date-range",
-          options: [...this.dateRangeOptions],
-          divider: false,
-          multiple: false,
-        },
-        {
           name: "ID",
           param: "id",
           type: "text",
@@ -295,7 +296,7 @@ export default {
       Object.keys(params).forEach(
         (key) =>
           (params[key] === null || params[key] === undefined) &&
-          delete params[key]
+          delete params[key],
       );
       delete params.page;
       delete params.page_size;

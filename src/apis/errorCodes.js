@@ -235,8 +235,17 @@ const errorCodes = (code) => {
     case "PASSWORD_TOO_COMMON":
       msg = "La contraseña es muy simple";
       break;
-    case "PASSWORD_ENTIRELY_NUMERIC":
-      msg = "La contraseña debe contener letras y numero";
+    case "PASSWORD_TOO_SIMILAR":
+      msg = "La contaseña no puede contener el nombre de usuario"
+      break;
+    case "PASSWORD_NO_NUMBER":
+      msg = "La contraseña debe contener al menos un número";
+      break;
+    case "PASSWORD_NO_UPPERCASE":
+      msg = "La contraseña debe contener al menos una letra mayúscula";
+      break;
+    case "PASSWORD_NO_SPECIAL_CHAR":
+      msg = "La contraseña debe contener al menos un caracter especial";
       break;
     case "PASSWORD_TOO_SHORT":
       msg = "La contraseña es muy corta";

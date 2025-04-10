@@ -64,9 +64,6 @@ export default {
     this.set_occurrences_filters({
       page: this.page,
       page_size: this.itemsPerPage,
-      owner_id: this.isCurrentUserOnlySme ? "" : this.currentUserId,
-      ordering: "status,due_date",
-      // facility_id: this.getFacilitiesByUser?.map((f) => f.id),
     });
     this.getOccurrences();
   },

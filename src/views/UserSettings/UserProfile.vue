@@ -200,7 +200,7 @@ export default {
   },
   methods: {
     ...mapActions(["set_alert"]),
-    ...mapActions("user", ["logout"]),
+    ...mapActions(["logout"]),
     ...mapMutations("user", [
       "SET_EMAIL",
       "SET_PHONE",

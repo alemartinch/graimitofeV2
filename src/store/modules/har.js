@@ -3,6 +3,7 @@ import { harParameters } from "@/store/modules/harParameters";
 import { purgeFilters } from "@/store/modules/helpers";
 import qs from "qs";
 import { saveFileAndUploadToS3 } from "@/store/modules/s3upload";
+import { getSixMonthsAgo, getToday } from "./helpers.js";
 
 const state = {
   regulation: {
@@ -240,6 +241,7 @@ const mutations = {
   set_occurrences_filters: (state, filters) => {
     state.occurrencesFilters = { ...state.occurrencesFilters, ...filters };
     purgeFilters(state.occurrencesFilters);
+
   },
 
   SET_OCCURRENCES: (state, data) => {
@@ -471,10 +473,6 @@ const mutations = {
     state.tasksData = JSON.parse(JSON.stringify(data));
   },
 
-  reset_har_filters: (state) => {
-    state.occurrencesFilters = {};
-    state.regulationFilters = {};
-  },
 };
 
 const actions = {
@@ -713,9 +711,14 @@ const actions = {
     return new Promise((resolve, reject) => {
       const filteredParams = Object.entries(state.occurrencesFilters).reduce(
         (acc, [key, value]) => {
-          if (value != null) {
-            // opera tanto para `null` y `undefined`
-            acc[key] = value;
+          if (
+            value != null && // Filtra `null` y `undefined`
+            value !== "" && // Filtra cadenas vacías
+            (!Array.isArray(value) || value.filter((v) => v !== "").length > 0) // Filtra arrays vacíos o con cadenas vacías
+          ) {
+            acc[key] = Array.isArray(value)
+              ? value.filter((v) => v !== "")
+              : value; // Limpia arrays con cadenas vacías
           }
           return acc;
         },

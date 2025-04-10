@@ -38,7 +38,7 @@
             />
           </div>
           <div class="flex-grow-1 pr-5" style="height: 430px; overflow: auto">
-            <v-form v-model="valid">
+            <v-form ref="form" v-model="valid">
               <div class="mb-1">Nombre de usuario</div>
               <v-text-field
                 v-model="user.username"
@@ -179,7 +179,7 @@
               <v-text-field
                 v-if="isNewUser"
                 v-model="user.password"
-                :rules="[userRules.required]"
+                :rules="[userRules.required, testNumberComputed, testMayusComputed, testSpecialComputed, testMinLengthComputed ]"
                 class="text-body-2"
                 outlined
                 dense
@@ -188,12 +188,28 @@
                 :disabled="!isNewUser"
                 required
               ></v-text-field>
+              <template v-if="isNewUser">
+                <ul class="mb-2 mt-0 ps-3">
+                  <li :class="{'color-green': testNumberComputed }">
+                    <span class="mdi mdi-check-circle"></span>Un número de 0 a 9.
+                  </li>
+                  <li :class="{'color-green': testMayusComputed }">
+                    <span class="mdi mdi-check-circle"></span>Una letra mayúscula.
+                  </li>
+                  <li :class="{'color-green': testSpecialComputed }">
+                    <span class="mdi mdi-check-circle"></span>Un caracter especial (!¡@#$%&?¿/+-).
+                  </li>
+                  <li :class="{'color-green': testMinLengthComputed }">
+                    <span class="mdi mdi-check-circle"></span>Mínimo 8 caracteres de logitud.
+                  </li>
+                </ul>
+              </template>
             </v-form>
           </div>
         </div>
       </v-card-text>
       <v-card-actions dense class="justify-end">
-        <v-btn small text color="secondary" @click="$router.go(-1)">
+        <v-btn small text color="secondary" @click="closeModal()">
           cerrar
         </v-btn>
         <v-btn
@@ -237,17 +253,17 @@ export default {
       },
       userRules: {
         required: (value) => !!value || "Campo requerido",
-        length: (value) => (!!value && value.length >= 3) || "minimo 3 letras",
+        length: (value) => (!!value && value?.length >= 3) || "minimo 3 letras",
         email: (value) => {
           const pattern =
             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
           return pattern.test(value) || "Mail invalido";
         },
-        groups: (value) => value.length > 0 || "Elija al menos un rol",
+        groups: (value) => value?.length > 0 || "Elija al menos un rol",
         isExternal: (value) => {
-          if (!value.includes("BASE")) {
+          if (!value?.includes("BASE")) {
             return true;
-          } else if (value.length !== 1) {
+          } else if (value?.length !== 1) {
             return "El usuario con rol externo no puede tener otro rol asignado";
           }
           return true;
@@ -283,6 +299,26 @@ export default {
         return { key: r[1], name: this.rolNameTranslate(r[0]) };
       });
     },
+    testMayusComputed() {
+      return (
+          /[A-Z]/.test(this.user?.password)
+      );
+    },
+    testNumberComputed() {
+      return (
+          /[0-9]/.test(this.user?.password)
+      );
+    },
+    testSpecialComputed() {
+      return (
+          /[!@#$%^&*()\-_=+[\]{};:'"\\|,.<>/?]/.test(this.user?.password)
+      )
+    },
+    testMinLengthComputed() {
+      return (
+          this.user?.password?.length >= 8
+      )
+    }
   },
 
   methods: {
@@ -290,6 +326,19 @@ export default {
     ...mapMutations(["SET_ALERT"]),
     eatApi() {
       return eatApi;
+    },
+
+    closeModal() {
+      this.resetValues();
+      this.$router.go(-1);
+    },
+
+    resetValues () {
+      this.$refs.form.reset();
+      this.$refs.form.resetValidation();
+
+      this.facilities = [];
+      this.user = {};
     },
 
     reset() {
@@ -436,5 +485,23 @@ export default {
   padding-top: 2px;
   line-height: 20px;
   color: #153240;
+}
+.color-green {
+  color: seagreen;
+}
+
+ul {
+  list-style: none;
+
+  & li {
+    display: flex;
+    align-items: center;
+  }
+
+  & span {
+    margin-bottom: 4px;
+    font-size: 24px;
+    margin-right: 2px;
+  }
 }
 </style>

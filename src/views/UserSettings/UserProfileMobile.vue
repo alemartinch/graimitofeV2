@@ -115,7 +115,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions("user", ["logout"]),
+    ...mapActions(["logout"]),
 
     logout_user() {
       this.alertButtonLoading = true;

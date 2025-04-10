@@ -50,6 +50,7 @@
           }"
           v-on:set-filters="setRegulationsFilters"
           :set-filter="filtersCurrent"
+          :loading="har.loadings.fetchRegulations"
         />
       </template>
     </LayoutPanel>

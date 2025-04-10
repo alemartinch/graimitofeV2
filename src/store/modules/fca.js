@@ -2,6 +2,7 @@ import { eatApi } from "@/apis";
 import qs from "qs";
 import { ACTION_STATUSES as AS, EVENT_ORIGINS } from "@/mixins/globals";
 import { purgeFilters } from "@/store/modules/helpers";
+import { getSixMonthsAgo, getToday } from "./helpers.js";
 
 const state = {
   temp_action: {
@@ -155,7 +156,7 @@ const getters = {
     if (isAuditEvent) {
       return state.findings.filter(
         (finding) =>
-          finding.deviation.key === "NC" || finding.deviation.key === "NCM"
+          finding.deviation.key === "NC" || finding.deviation.key === "NCM",
       );
     } else {
       return state.findings;
@@ -199,7 +200,9 @@ const getters = {
       return true;
     }
 
-    const causesInFinding = state.causes.filter((cause) => cause.finding === id);
+    const causesInFinding = state.causes.filter(
+      (cause) => cause.finding === id,
+    );
     if (!causesInFinding.length) {
       // El hallazgo no tiene causas
       return true;
@@ -411,27 +414,27 @@ const mutations = {
     if (deviation.key === "OM") deviation.name = "Oportunidad de mejora";
     payload.deviation = deviation;
     const findingIndex = state.findings.findIndex(
-      (finding) => finding.id === payload.id
+      (finding) => finding.id === payload.id,
     );
     state.findings.splice(findingIndex, 1, payload);
   },
 
   DELETE_FINDING: (state, payload) => {
     const findingIndex = state.findings.findIndex(
-      (finding) => finding.id === payload
+      (finding) => finding.id === payload,
     );
     state.findings.splice(findingIndex, 1);
 
     // busco las causas pertenecientes a ese hallazgo
     const causesFinding = state.causes.filter(
-      (cause) => cause.finding === payload
+      (cause) => cause.finding === payload,
     );
 
     if (causesFinding.length) {
       // Elimino del array causas[] las causas encontradas
       causesFinding.forEach((causeFinding) => {
         const causeIndex = state.causes.findIndex(
-          (cause) => cause.id === causeFinding.id
+          (cause) => cause.id === causeFinding.id,
         );
         if (state.actions.length) {
           // Busco las acciones correspondientes a cada causa a eliminar
@@ -457,7 +460,7 @@ const mutations = {
     const cause = payload;
     if (cause.cause_type.sub_causes) {
       cause.cause_type.sub_causes = state.cause_types.find(
-        (causeType) => causeType.id === payload.cause_type.id
+        (causeType) => causeType.id === payload.cause_type.id,
       ).sub_causes;
     }
     state.temp_cause = JSON.parse(JSON.stringify(cause));
@@ -496,7 +499,9 @@ const mutations = {
   },
 
   UPDATE_CAUSE: (state, payload) => {
-    const causeIndex = state.causes.findIndex((cause) => cause.id === payload.id);
+    const causeIndex = state.causes.findIndex(
+      (cause) => cause.id === payload.id,
+    );
     state.causes.splice(causeIndex, 1, payload);
   },
 
@@ -525,10 +530,6 @@ const mutations = {
   set_actions_filter: (state, filters) => {
     state.actionsFilters = { ...state.actionsFilters, ...filters };
     purgeFilters(state.actionsFilters, filters);
-  },
-
-  reset_fca_filters: (state) => {
-    state.actionsFilters = {};
   },
 
   set_actions: (state, actions) => {
@@ -667,7 +668,7 @@ const mutations = {
 
   delete_action_file: (state, fileId) => {
     const fileIndex = state.temp_action.files.findIndex(
-      (file) => file.id.toString() === fileId.toString()
+      (file) => file.id.toString() === fileId.toString(),
     );
     state.temp_action.files.splice(fileIndex, 1);
   },
@@ -701,7 +702,7 @@ const mutations = {
 
     if (typeof state.actions === "object") return;
     const actionIndex = state.actions.findIndex(
-      (action) => action.id === state.temp_action.id
+      (action) => action.id === state.temp_action.id,
     );
     state.temp_action.due_date = state.temp_action.due_date.substr(0, 10);
     state.actions.splice(actionIndex, 1, state.temp_action);
@@ -709,7 +710,7 @@ const mutations = {
 
   DELETE_ACTION: (state, payload) => {
     const actionIndex = state.actions.findIndex(
-      (action) => action.id === payload
+      (action) => action.id === payload,
     );
     state.actions.splice(actionIndex, 1);
   },

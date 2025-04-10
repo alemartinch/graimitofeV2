@@ -16,6 +16,8 @@ export default defineConfig({
       registerType: registerType,
       strategies: 'generateSW',
       workbox: {
+        globPatterns: ['**/*.{js,css,png,jpg,jpeg,svg,ico}'],
+        navigateFallback: null,
         maximumFileSizeToCacheInBytes: 5000000,
         cleanupOutdatedCaches: true,
         sourcemap: true,
@@ -34,7 +36,10 @@ export default defineConfig({
               cacheName: 'tcmt-cache-images',
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+                maxAgeSeconds: 5 * 24 * 60 * 60, // 5 days
+              },
+              matchOptions: {
+                ignoreSearch: true, // Ignore URL parameters
               },
             },
           },
